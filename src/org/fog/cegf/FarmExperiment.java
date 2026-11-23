@@ -42,6 +42,14 @@ public class FarmExperiment {
         Cfg.tau = Double.parseDouble(a.getOrDefault("tau", "0.7"));
         Cfg.load = Double.parseDouble(a.getOrDefault("load", "0.9"));
         Cfg.camScale = Double.parseDouble(a.getOrDefault("cam", "1.0"));
+        Cfg.tracePath = a.get("trace");
+        if (Cfg.tracePath != null) {
+            org.json.simple.JSONObject tm = OdrlEval.load(new java.io.File(Cfg.tracePath).getParent() + "/trace_meta.json");
+            org.json.simple.JSONObject pr = (org.json.simple.JSONObject) tm.get("params");
+            Cfg.speedup = ((Number) pr.get("speedup")).doubleValue();
+            Cfg.realStartH = ((Number) tm.get("real_start_hour")).doubleValue();
+            Cfg.sunriseH = ((Number) tm.get("sunrise_hour")).doubleValue();
+        }
         Cfg.policies = OdrlEval.load(a.getOrDefault("policies", "experiments/farm/results/policies.json"));
         Cfg.params.put("theta", Cfg.theta); Cfg.params.put("alpha", Cfg.alpha); Cfg.params.put("tau", Cfg.tau);
         Cfg.rnd = new Random(Cfg.seed + 77);
@@ -80,9 +88,29 @@ public class FarmExperiment {
             app.addTupleMapping("ctrl", "FRAME", "SUMMARY_F", new FractionalSelectivity(1.0));
             for (GovernedFogDevice e : edges) mm.addModuleToDevice("ctrl", e.getName());
             mm.addModuleToDevice("archive", "cloud");
+            if (Cfg.tracePath == null) {
+                for (int i = 0; i < Cfg.N_SENS; i++)
+                    addSensor("s" + i, "READING", edges.get(i % 3), new Dists.Periodic(Cfg.SENS_PERIOD_MS, Cfg.seed * 1000 + i), Cfg.seed * 7 + i, false, broker);
+            } else {
+                Map<Integer, List<double[]>> byStream = new TreeMap<>();
+                try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(Cfg.tracePath))) {
+                    br.readLine();                                          // header: t_ms,stream_id,comp,channel,zone,kind,value,entropy,useful
+                    for (String ln; (ln = br.readLine()) != null; ) {
+                        String[] f = ln.split(",");
+                        byStream.computeIfAbsent(Integer.parseInt(f[1]), k -> new ArrayList<>())
+                                .add(new double[]{Double.parseDouble(f[0]), Double.parseDouble(f[7]), Double.parseDouble(f[8])});
+                    }
+                }
+                for (Map.Entry<Integer, List<double[]>> e : byStream.entrySet()) {
+                    List<double[]> rows = e.getValue();
+                    rows.sort((x, y) -> Double.compare(x[0], y[0]));
+                    double[] ts = new double[rows.size()];
+                    for (int k = 0; k < ts.length; k++) ts[k] = rows.get(k)[0];
+                    GovernedSensor gs = addSensor("s" + e.getKey(), "READING", edges.get(e.getKey() % 3), new Dists.Replay(ts), Cfg.seed * 7 + e.getKey(), false, broker);
+                    gs.setTrace(rows); gs.setTransmissionStartDelay(0);
+                }
+            }
             int nCam = (int) Math.round(Cfg.N_CAM * Cfg.camScale);
-            for (int i = 0; i < Cfg.N_SENS; i++)
-                addSensor("s" + i, "READING", edges.get(i % 3), new Dists.Periodic(Cfg.SENS_PERIOD_MS, Cfg.seed * 1000 + i), Cfg.seed * 7 + i, false, broker);
             for (int i = 0; i < nCam; i++)
                 addSensor("c" + i, "FRAME", edges.get(i % 3), new Dists.Periodic(Cfg.CAM_PERIOD_MS, Cfg.seed * 1000 + 500 + i), Cfg.seed * 13 + i, false, broker);
         } else {
@@ -125,29 +153,31 @@ public class FarmExperiment {
         return d;
     }
 
-    static void addSensor(String name, String type, GovernedFogDevice gw, org.fog.utils.distribution.Distribution dist, long seed, boolean job, FogBroker broker) {
+    static GovernedSensor addSensor(String name, String type, GovernedFogDevice gw, org.fog.utils.distribution.Distribution dist, long seed, boolean job, FogBroker broker) {
         GovernedSensor s = new GovernedSensor(name, type, broker.getId(), "farm", dist, seed, job);
         s.setGatewayDeviceId(gw.getId()); s.setLatency(5.0);
         sensors.add(s);
+        return s;
     }
 
     // ------------------------------------------------------------------ reports
     static String kv(String k, double v) { return k + "=" + String.format(Locale.ROOT, "%.6f", v); }
 
     static String reportData() {
-        int total = 0, usefulN = 0, usefulSel = 0, timely = 0, sel = 0, readUseful = 0, readUsefulLost = 0;
+        int total = 0, usefulN = 0, usefulSel = 0, timely = 0, sel = 0, readUseful = 0, readUsefulLost = 0, readN = 0, readSel = 0, readUsefulSel = 0, readTimely = 0;
         List<Double> tta = new ArrayList<>(); double latSum = 0; int latN = 0;
         for (Metrics.Rec r : Metrics.all) {
             total++;
             if (r.selected) sel++;
+            if (r.type.equals("READING")) { readN++; if (r.selected) readSel++; }
             if (r.useful) {
                 usefulN++;
                 if (r.selected) usefulSel++;
-                if (r.type.equals("READING")) { readUseful++; if (r.lost) readUsefulLost++; }
+                if (r.type.equals("READING")) { readUseful++; if (r.lost) readUsefulLost++; if (r.selected) readUsefulSel++; }
             }
             if (r.selected && !r.lost && !Double.isNaN(r.done)) {
                 double lat = r.done - r.emit; latSum += lat; latN++;
-                if (r.useful) { tta.add(lat / 1000); if (lat <= r.deadline) timely++; }
+                if (r.useful) { tta.add(lat / 1000); if (lat <= r.deadline) { timely++; if (r.type.equals("READING")) readTimely++; } }
             }
         }
         double unenc = Cfg.encrypted() ? 0 : 100;
@@ -156,7 +186,7 @@ public class FarmExperiment {
                 kv("tta_p95", Metrics.percentile(tta, 95)), kv("edge_lat_mean_s", latN == 0 ? Double.NaN : latSum / latN / 1000),
                 kv("loss_useful_readings", (double) readUsefulLost / Math.max(1, readUseful)),
                 kv("energy_J_per_sensor_h", Metrics.sensorEnergyJ / Cfg.N_SENS), kv("unencrypted_pct", unenc),
-                kv("items", total), kv("unfinished", total - sel - 0 + 0 * latN));
+                kv("recall_read", (double) readUsefulSel / Math.max(1, readUseful)), kv("TUDR_read", (double) readTimely / Math.max(1, readUseful)), kv("volume_sel_read", (double) readSel / Math.max(1, readN)), kv("useful_read_frac", (double) readUseful / Math.max(1, readN)), kv("items", total));
     }
 
     static String reportJobs() {

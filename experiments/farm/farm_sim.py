@@ -150,6 +150,10 @@ def run_df(seed, flow, mode, theta=0.3, cam_scale=1.0, workload=None):
     if to_cloud_raw and not p_up["enc"]: unenc = 1.0
     if flow in (1, 2) and not p_up["enc"]: unenc = 1.0
     return dict(
+        recall_read=float((sel & W["useful"] & (kind == 0)).sum() / max(1, (W["useful"] & (kind == 0)).sum())),
+        TUDR_read=float((useful & (tta <= dl) & (k == 0)).sum() / max(1, (W["useful"] & (kind == 0)).sum())),
+        volume_sel_read=float(sel[kind == 0].mean()),
+        useful_read_frac=float(W["useful"][kind == 0].mean()),
         TUDR=timely_useful / useful_total,
         recall=(sel & W["useful"]).sum() / useful_total,
         volume_sel=sel.mean(),

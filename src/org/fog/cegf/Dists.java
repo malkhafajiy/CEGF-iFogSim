@@ -21,4 +21,16 @@ public class Dists {
         public int getDistributionType() { return Distribution.NORMAL; }
         public double getMeanInterTransmitTime() { return mean; }
     }
+    /** Replays absolute event times (ms): returns successive gaps; first gap is the first time itself. */
+    public static class Replay extends Distribution {
+        private final double[] t; private int i = 0;
+        public Replay(double[] timesMs) { this.t = timesMs; }
+        public double getNextValue() {
+            if (i >= t.length) return 1e12;                         // no more events
+            double v = i == 0 ? Math.max(1.0, t[0]) : Math.max(0.001, t[i] - t[i - 1]);
+            i++; return v;
+        }
+        public int getDistributionType() { return Distribution.DETERMINISTIC; }
+        public double getMeanInterTransmitTime() { return 30000; }
+    }
 }

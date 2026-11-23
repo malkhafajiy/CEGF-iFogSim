@@ -23,6 +23,10 @@ import org.json.simple.JSONObject;
 public class GovernedSensor extends Sensor {
     private final Random rnd;
     private final boolean jobSensor;
+    private java.util.List<double[]> trace = null;   // rows: {t_ms, entropy, useful}
+    private int traceIdx = 0;
+
+    public void setTrace(java.util.List<double[]> rows) { this.trace = rows; }
 
     public GovernedSensor(String name, String tupleType, int userId, String appId, Distribution d, long seed, boolean jobSensor) {
         super(name, tupleType, userId, appId, d);
@@ -75,10 +79,20 @@ public class GovernedSensor extends Sensor {
         double nowMs = CloudSim.clock();
         if (nowMs > Cfg.WINDOW_MS) return;
         boolean frame = getTupleType().equals("FRAME");
-        double ramp = 1 / (1 + Math.exp(-((Cfg.T0_S + nowMs / 1000) - 6 * 3600) / 1200.0));
-        double pu = frame ? 0.08 + 0.55 * ramp : 0.10 + 0.60 * ramp;
-        boolean useful = rnd.nextDouble() < pu;
-        double H = useful ? beta(5, 2) : beta(1.5, 8);
+        boolean useful; double H;
+        if (trace != null) {                                   // option 2: readings replayed from the real-data trace
+            if (traceIdx >= trace.size()) return;
+            double[] row = trace.get(traceIdx++);
+            H = row[1]; useful = row[2] == 1;
+        } else {
+            double clockS = Cfg.tracePath != null ? Cfg.realStartH * 3600 + (nowMs / 1000) * Cfg.speedup
+                                                  : Cfg.T0_S + nowMs / 1000;
+            double sunrise = Cfg.tracePath != null ? Cfg.sunriseH * 3600 : 6 * 3600;
+            double ramp = 1 / (1 + Math.exp(-(clockS - sunrise) / 1200.0));
+            double pu = frame ? 0.08 + 0.55 * ramp : 0.10 + 0.60 * ramp;
+            useful = rnd.nextDouble() < pu;
+            H = useful ? beta(5, 2) : beta(1.5, 8);
+        }
         Metrics.Rec r = Metrics.newRec(getTupleType(), nowMs, Cfg.DEADLINE_MS[frame ? 1 : 0]);
         r.useful = useful;
         if (Cfg.mode.equals("CEGF")) {

@@ -1,0 +1,52 @@
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix cegf: <https://example.org/cegf#> .
+
+# CEGF job-recipient policy (paper Listing "recipient") with concrete thresholds: alpha = 0.25, tau = 0.7.
+# A job may be moved to any recipient (permission), unless it is critical and the recipient's availability
+# is below alpha, or it is confidential and the recipient's trust is below tau (prohibitions win).
+<https://example.org/cegf/policy/job-recipient> a odrl:Set ;
+  odrl:conflict odrl:prohibit ;
+  odrl:permission [
+    odrl:target cegf:jobs ;
+    odrl:action odrl:move
+  ] ;
+  odrl:prohibition [
+    odrl:target [
+      a odrl:AssetCollection ;
+      odrl:source cegf:jobs ;
+      odrl:refinement [
+        odrl:leftOperand cegf:critical ;
+        odrl:operator odrl:eq ;
+        odrl:rightOperand "true"^^xsd:boolean
+      ]
+    ] ;
+    odrl:action [
+      rdf:value odrl:move ;
+      odrl:refinement [
+        odrl:leftOperand cegf:availability ;
+        odrl:operator odrl:lt ;
+        odrl:rightOperand "0.25"^^xsd:double
+      ]
+    ]
+  ] ;
+  odrl:prohibition [
+    odrl:target [
+      a odrl:AssetCollection ;
+      odrl:source cegf:jobs ;
+      odrl:refinement [
+        odrl:leftOperand cegf:confidential ;
+        odrl:operator odrl:eq ;
+        odrl:rightOperand "true"^^xsd:boolean
+      ]
+    ] ;
+    odrl:action [
+      rdf:value odrl:move ;
+      odrl:refinement [
+        odrl:leftOperand cegf:trust ;
+        odrl:operator odrl:lt ;
+        odrl:rightOperand "0.7"^^xsd:double
+      ]
+    ]
+  ] .

@@ -13,6 +13,9 @@ public class Cfg {
     public static JSONObject policies;
     public static Map<String, Double> params = new HashMap<>();
     public static Random rnd = new Random(1);
+    // trace-driven readings (option 2): real clock = realStartH + simTime * speedup
+    public static String tracePath = null;
+    public static double realStartH = 4, speedup = 10, sunriseH = 6.5;
     // runtime policy change (E3): parameters switch at changeT; outageMs > 0 models a hard-coded policy that needs a redeploy
     public static double changeT = -1, alpha2 = 0.5, tau2 = 0.9, outageMs = 0;
     public static Map<String, Double> params2 = new HashMap<>();

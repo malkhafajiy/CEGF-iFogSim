@@ -1,0 +1,18 @@
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix cegf: <https://example.org/cegf#> .
+
+# CEGF entropy-based data selection (paper Listing "freshness") with theta = 0.3.
+<https://example.org/cegf/policy/entropy-selection> a odrl:Set ;
+  odrl:permission [
+    odrl:target cegf:data ;
+    odrl:action [
+      rdf:value odrl:select ;
+      odrl:refinement [
+        odrl:leftOperand cegf:entropy ;
+        odrl:operator odrl:gteq ;
+        odrl:rightOperand "0.3"^^xsd:double
+      ]
+    ]
+  ] .
