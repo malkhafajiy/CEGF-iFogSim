@@ -76,9 +76,10 @@ def edge_queue(arr, svc, zone, rng_unused=None):
     return fin, wait, dropped
 
 
-def run_df(seed, flow, mode, theta=0.3, cam_scale=1.0):
+def run_df(seed, flow, mode, theta=0.3, cam_scale=1.0, workload=None):
+    """workload: optional dict from traces/trace_io.trace_workload (trace-driven readings); default = synthetic."""
     rng = np.random.default_rng(seed)
-    W = gen_workload(rng, int(round(N_CAM * cam_scale)))
+    W = workload if workload is not None else gen_workload(rng, int(round(N_CAM * cam_scale)))
     p_edge, p_up = (PROTO[x] for x in MODES[mode])
     n_all = len(W["t"]); kind = W["kind"]
     if mode == "CEGF":   # the entropy policy (Listing "freshness") selects the data; vectorised check below
@@ -143,7 +144,7 @@ def run_df(seed, flow, mode, theta=0.3, cam_scale=1.0):
     energy_edge = (sens_bytes.sum() * E_BYTE + nc_edge[k == 0].sum() * E_HS) if to_edge else 0.0
     energy_cloud = (((size[k == 0] + p_up["oh"]).sum() * E_BYTE + (rng.random(n)[k == 0] < p_up["newconn"]).sum() * E_HS)
                     if to_cloud_raw else 0.0)
-    hours = (T1 - T0) / 3600
+    hours = W.get("hours", (T1 - T0) / 3600)
     unenc = 0.0
     if to_edge and not p_edge["enc"]: unenc = 1.0
     if to_cloud_raw and not p_up["enc"]: unenc = 1.0
