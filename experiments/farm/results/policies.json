@@ -1,0 +1,109 @@
+{
+ "entropy": {
+  "@context": "http://www.w3.org/ns/odrl/2/",
+  "@type": "Set",
+  "permission": [
+   {
+    "assignee": "role:DataOwner",
+    "target": "http://.../data/",
+    "action": [
+     {
+      "rdf:value": {
+       "@id": "odrl:select"
+      },
+      "refinement": [
+       {
+        "leftOperand": "http://.../vocab/entropy",
+        "operator": "odrl:gteq",
+        "rightOperand": {
+         "@value": "theta",
+         "@type": "xsd:double"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "recipient": {
+  "@context": "http://www.w3.org/ns/odrl/2/",
+  "@type": "Set",
+  "conflict": "odrl:prohibit",
+  "permission": [
+   {
+    "assignee": "http://.../role/Initiator",
+    "target": "http://.../job/",
+    "action": "odrl:move"
+   }
+  ],
+  "prohibition": [
+   {
+    "assignee": "http://.../role/Initiator",
+    "target": {
+     "@type": "AssetCollection",
+     "source": "http://.../job/",
+     "refinement": [
+      {
+       "leftOperand": "http://.../vocab/job/critical",
+       "operator": "odrl:eq",
+       "rightOperand": {
+        "@value": "true",
+        "@type": "xsd:boolean"
+       }
+      }
+     ]
+    },
+    "action": [
+     {
+      "rdf:value": {
+       "@id": "odrl:move"
+      },
+      "refinement": [
+       {
+        "leftOperand": "http://.../vocab/recipient/availability",
+        "operator": "odrl:lt",
+        "rightOperand": {
+         "@value": "alpha"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "assignee": "http://.../role/Initiator",
+    "target": {
+     "@type": "AssetCollection",
+     "source": "http://.../job/",
+     "refinement": [
+      {
+       "leftOperand": "http://.../vocab/job/confidential",
+       "operator": "odrl:eq",
+       "rightOperand": {
+        "@value": "true",
+        "@type": "xsd:boolean"
+       }
+      }
+     ]
+    },
+    "action": [
+     {
+      "rdf:value": {
+       "@id": "odrl:move"
+      },
+      "refinement": [
+       {
+        "leftOperand": "http://.../vocab/recipient/trust",
+        "operator": "odrl:lt",
+        "rightOperand": {
+         "@value": "tau"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

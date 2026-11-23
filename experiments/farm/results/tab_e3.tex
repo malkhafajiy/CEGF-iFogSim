@@ -1,0 +1,12 @@
+\begin{table}[htbp]\scriptsize\centering
+\caption{E3 -- policy change at $t$=900\,s ($\alpha$: 0.25$\to$0.5, $\tau$: 0.7$\to$0.9). Violations audited against the policy in force at decision time.}\label{tab:e3}
+\begin{tabular}{lrrrr}
+\toprule
+Setup & Crit.\ miss pre (\%) & Crit.\ miss post (\%) & Violations (\%) & Conf.\ viol.\ (\%) \\
+\midrule
+no change & 0.4\,$\pm$\,0.2 & 0.5\,$\pm$\,0.3 & 0.0\,$\pm$\,0.0 & 0.0\,$\pm$\,0.0 \\
+CEGF (runtime swap) & 0.4\,$\pm$\,0.2 & 2.4\,$\pm$\,0.7 & 0.0\,$\pm$\,0.0 & 0.0\,$\pm$\,0.0 \\
+hard-coded (30 s redeploy) & 0.4\,$\pm$\,0.2 & 7.7\,$\pm$\,0.8 & 0.0\,$\pm$\,0.0 & 0.0\,$\pm$\,0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -6,3 +6,11 @@ bin/
 out/
 *.iml
 .idea/
+
+# build / generated
+output/
+experiments/ifogsim/build/
+__pycache__/
+*.log
+# raw downloaded datasets (re-created by experiments/traces/fetch_greenhouse.py)
+dataset/greenhouse_challenge_2019/raw/
