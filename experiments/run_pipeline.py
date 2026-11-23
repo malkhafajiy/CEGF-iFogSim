@@ -57,7 +57,16 @@ def mean_ci(x):
     return (x.mean(), tcrit(len(x)) * x.std(ddof=1) / np.sqrt(len(x))) if len(x) > 1 else (x.mean() if len(x) else np.nan, 0.0)
 
 
+PAPER_DIR = None          # set by --paper-figures: write title-free figures to this folder instead
+
+
+def suptitle(fig, text, **kw):
+    if not PAPER_DIR:
+        fig.suptitle(text, **kw)
+
+
 def save(fig, folder, name):
+    folder = PAPER_DIR or folder
     os.makedirs(folder, exist_ok=True)
     fig.savefig(os.path.join(folder, name + ".png"), dpi=170, bbox_inches="tight")
     fig.savefig(os.path.join(folder, name + ".pdf"), bbox_inches="tight")
@@ -155,7 +164,7 @@ def stage_workload():
     for i, (k, v) in enumerate(facts):
         a.text(0.0, 0.95 - i * 0.135, k, fontsize=10, fontweight="bold", va="top"); a.text(0.52, 0.95 - i * 0.135, v, fontsize=10, va="top")
     a.set_title("(f) The workload", loc="left", fontsize=10)
-    fig.suptitle("Stage 1 - Real greenhouse workload", fontsize=13, fontweight="bold", x=0.01, ha="left")
+    suptitle(fig, "Stage 1 - Real greenhouse workload", fontsize=13, fontweight="bold", x=0.01, ha="left")
     fig.tight_layout(); save(fig, D1, "workload_overview")
     return dict(meta=meta)
 
@@ -206,8 +215,9 @@ def stage_policies():
     fig.legend(handles=handles, loc="lower left", bbox_to_anchor=(0.05, -0.01), ncol=2, frameon=False, fontsize=9)
     v = r["validation"]
     sub = f"SHACL validation: {sum(x['valid_ODRL'] for x in v.values())}/{len(v)} policies valid ODRL, {sum(x['errors'] for x in v.values())} errors | decisions identical in {r['agree']}/{r['total']} cases (white lines: α = {r['alpha']}, τ = {r['tau']})"
-    fig.suptitle("Stage 2 - ODRL policies checked against the independent OVAL evaluator", fontsize=13, fontweight="bold", x=0.01, ha="left", y=1.0)
-    fig.text(0.01, 0.94, sub, fontsize=9, color=INK2)
+    suptitle(fig, "Stage 2 - ODRL policies checked against the independent OVAL evaluator", fontsize=13, fontweight="bold", x=0.01, ha="left", y=1.0)
+    if not PAPER_DIR:
+        fig.text(0.01, 0.94, sub, fontsize=9, color=INK2)
     save(fig, D2, "policy_validation")
     return dict(agree=r["agree"], total=r["total"], validation=r["validation"])
 
@@ -244,25 +254,33 @@ def stage_figures():
     figures_simulation(*d, VARIANTS, POLS)
 
 
-def stage_simulation(seeds):
+def stage_simulation(seeds, parts=("e1", "e2", "e3")):
     print("[3/3] simulation: iFogSim2 experiments", flush=True)
     S = list(range(1, seeds + 1))
     TR = dict(trace=TRACE_REL)
+    pols = POLS
     # ---- E1: data flow on the real trace
     variants = [("UG", "Ungoverned (plain MQTT)", dict(mode="UG")), ("SS", "All-HTTPS", dict(mode="SS")),
                 ("CEGF03", "CEGF θ=0.3", dict(mode="CEGF", theta=0.3)), ("CEGF01", "CEGF θ=0.1", dict(mode="CEGF", theta=0.1))]
-    e1 = batch([({"variant": v, "label": lab, "workload": "real trace"}, dict(scenario="data", cam=c, seed=s, **TR, **kw)) for s in S for v, lab, kw in variants for c in (1.0, 1.5)], "e1_modes_real_trace")
-    th = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
-    e1t = batch([({"workload": w}, dict(scenario="data", mode="CEGF", theta=t, seed=s, **(TR if w == "real trace" else {}))) for s in S for t in th for w in ("real trace", "synthetic")], "e1_theta_sweep")
-    # ---- E2: job distribution
-    pols = ["cegf", "greedy", "random", "static", "cloud"]
-    e2 = batch([({}, dict(scenario="jobs", policy=p, load=l, seed=s)) for s in S for p in pols for l in (0.6, 0.9, 1.2, 1.5)], "e2_jobs_vs_load")
-    e2t = batch([({}, dict(scenario="jobs", policy="cegf", load=1.2, alpha=a, tau=t, seed=s)) for s in S for a in (0.0, 0.25, 0.5, 0.75) for t in (0.5, 0.7, 0.9, 0.96)], "e2_thresholds")
-    # ---- E3: policy change at run time
-    ch = dict(scenario="jobs", policy="cegf", load=1.0, change_t=900)
-    e3 = batch([({"variant": "No change"}, dict(**ch, alpha2=0.25, tau2=0.7, seed=s)) for s in S] +
-               [({"variant": "Runtime swap (CEGF)"}, dict(**ch, alpha2=0.5, tau2=0.9, seed=s)) for s in S] +
-               [({"variant": "Hard-coded, 30 s redeploy"}, dict(**ch, alpha2=0.5, tau2=0.9, outage_s=30, seed=s)) for s in S], "e3_policy_change")
+    names = ("e1_modes_real_trace", "e1_theta_sweep", "e2_jobs_vs_load", "e2_thresholds", "e3_policy_change")
+    if "e1" in parts:
+        e1 = batch([({"variant": v, "label": lab, "workload": "real trace"}, dict(scenario="data", cam=c, seed=s, **TR, **kw)) for s in S for v, lab, kw in variants for c in (1.0, 1.5)], names[0])
+        th = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+        e1t = batch([({"workload": w}, dict(scenario="data", mode="CEGF", theta=t, seed=s, **(TR if w == "real trace" else {}))) for s in S for t in th for w in ("real trace", "synthetic")], names[1])
+    else:
+        e1, e1t = (read_raw(n) for n in names[:2])
+    if "e2" in parts:
+        e2 = batch([({}, dict(scenario="jobs", policy=p, load=l, seed=s)) for s in S for p in pols for l in (0.6, 0.9, 1.2, 1.5)], names[2])
+        e2t = batch([({}, dict(scenario="jobs", policy="cegf", load=1.2, alpha=a, tau=t, seed=s)) for s in S for a in (0.0, 0.25, 0.5, 0.75) for t in (0.5, 0.7, 0.9, 0.96)], names[3])
+    else:
+        e2, e2t = (read_raw(n) for n in names[2:4])
+    if "e3" in parts:
+        ch = dict(scenario="jobs", policy="cegf", load=1.0, change_t=900)
+        e3 = batch([({"variant": "No change"}, dict(**ch, alpha2=0.25, tau2=0.7, seed=s)) for s in S] +
+                   [({"variant": "Runtime swap (CEGF)"}, dict(**ch, alpha2=0.5, tau2=0.9, seed=s)) for s in S] +
+                   [({"variant": "Hard-coded, 30 s redeploy"}, dict(**ch, alpha2=0.5, tau2=0.9, outage_s=30, seed=s)) for s in S], names[4])
+    else:
+        e3 = read_raw(names[4])
     figures_simulation(e1, e1t, e2, e2t, e3, variants, pols)
     return dict(e1=e1, e1t=e1t, e2=e2, e2t=e2t, e3=e3)
 
@@ -285,7 +303,7 @@ def figures_simulation(e1, e1t, e2, e2t, e3, variants, pols):
         a.set_xticks([1.65, 6.85]); a.set_xticklabels(["12 cameras\n(nominal)", "18 cameras\n(+50 % load)"]); a.set_title(title, loc="left", fontsize=10); a.grid(axis="x", visible=False)
     ax[0].set_ylim(0, 115); ax[1].set_ylim(0, 115)
     fig.legend(*ax[0].get_legend_handles_labels(), loc="lower center", ncol=4, frameon=False, fontsize=9, bbox_to_anchor=(0.5, -0.08))
-    fig.suptitle("E1 - Data flow on the real greenhouse workload (iFogSim2, mean ± 95 % CI)", fontsize=12, fontweight="bold", x=0.01, ha="left")
+    suptitle(fig, "E1 - Data flow on the real greenhouse workload (iFogSim2, mean ± 95 % CI)", fontsize=12, fontweight="bold", x=0.01, ha="left")
     fig.tight_layout(); save(fig, D3, "fig1_data_flow_real_trace")
 
     # ---------------- Fig 2: theta sweep, real vs synthetic
@@ -299,7 +317,7 @@ def figures_simulation(e1, e1t, e2, e2t, e3, variants, pols):
         a.set_xlabel(x); a.set_ylabel(y); a.set_title(t, loc="left", fontsize=10)
     ax[0].legend(fontsize=8, frameon=False)
     ax[2].plot([0, 100], [0, 100], color=INK2, ls=":", lw=1); ax[2].text(55, 47, "random selection", fontsize=7.5, color=INK2, rotation=33)
-    fig.suptitle("E1 - How well does the entropy filter work? Real greenhouse data vs the synthetic assumption", fontsize=12, fontweight="bold", x=0.01, ha="left")
+    suptitle(fig, "E1 - How well does the entropy filter work? Real greenhouse data vs the synthetic assumption", fontsize=12, fontweight="bold", x=0.01, ha="left")
     fig.tight_layout(); save(fig, D3, "fig2_entropy_threshold")
 
     # ---------------- Fig 3: job distribution vs load
@@ -313,7 +331,7 @@ def figures_simulation(e1, e1t, e2, e2t, e3, variants, pols):
         a.set_xlabel("edge load (1.0 = edge capacity)"); a.set_ylabel(yl)
         if log: a.set_yscale("log")
     ax[0][0].legend(fontsize=8, frameon=False)
-    fig.suptitle("E2 - Job distribution under the job-recipient policy (iFogSim2, mean ± 95 % CI)", fontsize=12, fontweight="bold", x=0.01, ha="left")
+    suptitle(fig, "E2 - Job distribution under the job-recipient policy (iFogSim2, mean ± 95 % CI)", fontsize=12, fontweight="bold", x=0.01, ha="left")
     fig.tight_layout(); save(fig, D3, "fig3_job_distribution")
 
     # ---------------- Fig 4: alpha x tau
@@ -327,7 +345,7 @@ def figures_simulation(e1, e1t, e2, e2t, e3, variants, pols):
         for i in range(piv.shape[0]):
             for j in range(piv.shape[1]):
                 v = piv.values[i, j]; a.text(j, i, f"{v:.1f}", ha="center", va="center", fontsize=8.5, color="white" if v > 9 else INK)
-    fig.suptitle("E2 - Sensitivity to the policy thresholds (edge load 1.2)", fontsize=12, fontweight="bold", x=0.01, ha="left")
+    suptitle(fig, "E2 - Sensitivity to the policy thresholds (edge load 1.2)", fontsize=12, fontweight="bold", x=0.01, ha="left")
     fig.tight_layout(); save(fig, D3, "fig4_threshold_sensitivity")
 
     # ---------------- Fig 5: policy change
@@ -414,7 +432,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stages", default="all")
     ap.add_argument("--seeds", type=int, default=20)
+    ap.add_argument("--paper-figures", default=None, help="folder for title-free publication figures")
+    ap.add_argument("--parts", default="e1,e2,e3", help="simulation experiments to (re)run")
     a = ap.parse_args()
+    global PAPER_DIR
+    PAPER_DIR = os.path.abspath(a.paper_figures) if a.paper_figures else None
     st = ["workload", "policies", "simulation", "summary"] if a.stages == "all" else a.stages.split(",")
     os.makedirs(RES, exist_ok=True)
     t0 = time.time()
@@ -424,7 +446,7 @@ def main():
     if "policies" in st:
         stage_policies()
     if "simulation" in st:
-        stage_simulation(a.seeds)
+        stage_simulation(a.seeds, tuple(a.parts.split(",")))
     if "figures" in st:
         stage_figures()
     if "summary" in st:

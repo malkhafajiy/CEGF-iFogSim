@@ -11,7 +11,7 @@
  "sim_horizon_s": 3600.0,
  "sample_period_sim_s": 30.0,
  "real_start_hour": 4.0,
- "sunrise_hour": 0.08333333333333333,
+ "sunrise_hour": 7.416666666666667,
  "n_streams": 40,
  "n_readings": 4800,
  "dropped_streams": [

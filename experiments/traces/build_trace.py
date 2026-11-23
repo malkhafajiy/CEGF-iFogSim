@@ -84,12 +84,15 @@ def auc(score, label):
 
 
 def sunrise_hour(day):
-    """First hour of the day with inside PAR > 5 in the Reference compartment (data-driven sunrise proxy)."""
+    """Sunrise proxy: first hour of the day with outdoor global radiation (Weather.csv, Iglob) above 5 W/m2.
+    (The inside PAR in GreenhouseClimate.csv includes assimilation lighting and is therefore not usable.)"""
     try:
-        s = load_series("Reference", "GreenhouseClimate.csv", "Tot_PAR")
-        d = s[(s.index >= day) & (s.index < day + pd.Timedelta(days=1))]
-        t = d[d > 5].index[0]
-        return t.hour + t.minute / 60
+        d = pd.read_csv(os.path.join(RAW, "Weather", "Weather.csv"), usecols=["%time", "Iglob"], low_memory=False)
+        t = pd.to_datetime(pd.to_numeric(d["%time"], errors="coerce"), unit="D", origin="1899-12-30").dt.round("min")
+        x = pd.Series(pd.to_numeric(d["Iglob"], errors="coerce").values, index=t)
+        x = x[(x.index >= day) & (x.index < day + pd.Timedelta(days=1))]
+        t0 = x[x > 5].index[0]
+        return t0.hour + t0.minute / 60
     except Exception:
         return 6.5
 

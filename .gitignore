@@ -15,3 +15,6 @@ __pycache__/
 # raw downloaded datasets (re-created by experiments/traces/fetch_greenhouse.py)
 dataset/greenhouse_challenge_2019/raw/
 experiments/odrl_engine/vendor/
+
+# paper section (kept local)
+experiments/paper/

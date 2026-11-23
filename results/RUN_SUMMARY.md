@@ -1,6 +1,6 @@
 # Run summary
 
-Generated 2026-11-23 12:30 | git 6da368f | openjdk version "21.0.13.1" 2026-11-17 LTS | Python 3.12.10 | 20 seeds per configuration | iFogSim2 only (the Python simulator was not used).
+Generated 2026-11-23 12:57 | git c032329 | openjdk version "21.0.13.1" 2026-11-17 LTS | Python 3.12.10 | 20 seeds per configuration | iFogSim2 only (the Python simulator was not used).
 
 ## Stage 1 - Real workload
 
@@ -27,12 +27,12 @@ Autonomous Greenhouse Challenge 2019 (cherry tomato, 4TU.ResearchData, CC0). Win
 |---|---|---|---|---|---|---|---|
 | 12 | Ungoverned | 98.0 | 100.0 | 100.0 | 17.8 | 0.019 | 2.0 |
 | 12 | All-HTTPS | 99.5 | 100.0 | 100.0 | 27.3 | 1.375 | 0.0 |
-| 12 | CEGF θ=0.3 | 93.7 | 49.1 | 24.0 | 16.5 | 0.006 | 0.0 |
-| 12 | CEGF θ=0.1 | 98.2 | 82.7 | 53.1 | 22.2 | 0.013 | 0.0 |
-| 18 | Ungoverned | 3.1 | 100.0 | 100.0 | 23.8 | 0.019 | 2.0 |
-| 18 | All-HTTPS | 0.9 | 100.0 | 100.0 | 27.1 | 1.375 | 0.0 |
-| 18 | CEGF θ=0.3 | 93.6 | 49.1 | 24.0 | 24.3 | 0.006 | 0.0 |
-| 18 | CEGF θ=0.1 | 69.3 | 82.7 | 53.1 | 32.3 | 0.013 | 0.0 |
+| 12 | CEGF θ=0.3 | 91.8 | 49.1 | 24.0 | 12.7 | 0.006 | 0.0 |
+| 12 | CEGF θ=0.1 | 97.5 | 82.7 | 53.1 | 20.6 | 0.013 | 0.0 |
+| 18 | Ungoverned | 3.3 | 100.0 | 100.0 | 23.8 | 0.019 | 2.0 |
+| 18 | All-HTTPS | 1.1 | 100.0 | 100.0 | 27.1 | 1.375 | 0.0 |
+| 18 | CEGF θ=0.3 | 92.6 | 49.1 | 24.0 | 18.6 | 0.006 | 0.0 |
+| 18 | CEGF θ=0.1 | 73.4 | 82.7 | 53.1 | 29.9 | 0.013 | 0.0 |
 
 ![E1](03_simulation/fig1_data_flow_real_trace.png)
 

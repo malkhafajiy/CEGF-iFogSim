@@ -1,0 +1,26 @@
+[build] compiling iFogSim2 + CEGF code
+  629 classes
+[1/3] workload: real greenhouse data -> trace
+MD5 ok 2a0c7f3332881caef54ca8f4dc60c9a3
+extracted 45 files to c:\Users\m_alk\Postechy\iFogSimGEGF\dataset\greenhouse_challenge_2019\raw\extracted
+40 streams, 4800 readings, dropped 5 candidates
+useful fraction 0.13 by third {'first': 0.098125, 'middle': 0.14625, 'last': 0.15375}
+entropy mean: useful 0.34 vs other 0.16; AUC 0.743
+theta sweep (forwarded / recall): {'0.0': (1.0, 1.0), '0.1': (0.53, 0.83), '0.2': (0.37, 0.65), '0.3': (0.24, 0.49), '0.4': (0.15, 0.37), '0.5': (0.07, 0.24), '0.6': (0.03, 0.13), '0.7': (0.02, 0.08), '0.8': (0.01, 0.07)}
+  figure: results\01_workload\workload_overview.png
+[3/3] simulation: iFogSim2 experiments
+  e1_modes_real_trace: 160 runs in 285 s
+  e1_theta_sweep: 360 runs in 190 s
+  figure: results\03_simulation\fig1_data_flow_real_trace.png
+  figure: results\03_simulation\fig2_entropy_threshold.png
+  figure: results\03_simulation\fig3_job_distribution.png
+  figure: results\03_simulation\fig4_threshold_sensitivity.png
+  figure: results\03_simulation\fig5_policy_change.png
+[figures] redrawing stage-3 figures from results/03_simulation/raw
+  figure: results\03_simulation\fig1_data_flow_real_trace.png
+  figure: results\03_simulation\fig2_entropy_threshold.png
+  figure: results\03_simulation\fig3_job_distribution.png
+  figure: results\03_simulation\fig4_threshold_sensitivity.png
+  figure: results\03_simulation\fig5_policy_change.png
+[summary] writing results/RUN_SUMMARY.md
+done in 8.3 min -> c:\Users\m_alk\Postechy\iFogSimGEGF\results
