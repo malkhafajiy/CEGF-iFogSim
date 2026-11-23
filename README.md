@@ -22,12 +22,35 @@ A smart greenhouse: 40 soil sensors and 12 cameras (data layer), three edge gate
 Baselines: ungoverned, all-HTTPS (E1); random, cloud-only, static, greedy (E2).
 
 
+## How to run
+
+**Requirements:** JDK 21, Python 3.12, git, and `pip install numpy pandas matplotlib py7zr rdflib pyshacl requests python-dateutil jinja2`. Run everything from the repository root.
+
+**Full pipeline (one command, about 30 minutes with 20 seeds):**
+
+```
+python experiments/run_pipeline.py
+```
+
+It compiles the code, downloads the real greenhouse data (8 MB, CC0) and builds the workload trace, validates the ODRL policies against OVAL (fetch it once with `python -P experiments/odrl_engine/fetch_oval.py`), runs the iFogSim2 experiments, and writes figures, tables and `results/RUN_SUMMARY.md` to `results/`.
+
+Useful options: `--stages workload,policies,simulation,figures,summary` (run only some stages), `--seeds 3` (quick test), `--parts e1,e2,e3` (re-run only some experiments), `--paper-figures DIR` (title-free figures for a paper).
+
+**A single simulation** (after the pipeline has compiled the code):
+
+```
+java -cp "jars/*;jars/commons-math3-3.5/*;experiments/ifogsim/build" org.fog.cegf.FarmExperiment scenario=jobs policy=cegf load=0.9 seed=1
+```
+
+Options: `scenario=data|jobs`, `mode=UG|SS|CEGF` and `trace=<trace.csv>` (data flow), `policy=cegf|greedy|random|static|cloud` and `load=` (jobs), `theta`, `alpha`, `tau`, `cam`, `seed`. It prints one `RESULT` line.
+
+
 ## ODRL policy validation (OVAL)
 
 The two policies are also written as standard ODRL in Turtle (`experiments/odrl_engine/job_recipient_policy.ttl`, `entropy_policy.ttl`) and checked against an independent evaluator, the [OVAL evaluator of the ODRL Engine](https://github.com/DIPS-Tools/ODRL-Engine) (DIPS, University of Southampton, MIT licence):
 
 * **SHACL validation:** both policies are valid ODRL, with no errors or warnings.
-* **Decision cross-check:** OVAL and the simulator's own evaluator (`OdrlEval`) give identical decisions on 147 test cases, including boundary values.
+* **Decision cross-check:** OVAL and the simulator's own evaluator (`OdrlEval`) give identical decisions on 451 test cases, including boundary values.
 
 ```
 python -P experiments/odrl_engine/fetch_oval.py          # fetch OVAL at a pinned commit (git-ignored vendor/ folder)
