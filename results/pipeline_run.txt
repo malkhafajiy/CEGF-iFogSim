@@ -1,0 +1,15 @@
+[build] compiling iFogSim2 + CEGF code
+  629 classes
+[3/3] simulation: iFogSim2 experiments
+  e1_modes_real_trace: 160 runs in 445 s
+  e1_theta_sweep: 360 runs in 181 s
+  e2_jobs_vs_load: 400 runs in 344 s
+  e2_thresholds: 320 runs in 161 s
+  e3_policy_change: 60 runs in 32 s
+  figure: results\03_simulation\fig1_data_flow_real_trace.png
+  figure: results\03_simulation\fig2_entropy_threshold.png
+  figure: results\03_simulation\fig3_job_distribution.png
+  figure: results\03_simulation\fig4_threshold_sensitivity.png
+  figure: results\03_simulation\fig5_policy_change.png
+[summary] writing results/RUN_SUMMARY.md
+done in 19.6 min -> c:\Users\m_alk\Postechy\iFogSimGEGF\results

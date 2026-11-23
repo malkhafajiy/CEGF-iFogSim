@@ -1,0 +1,353 @@
+{
+ "source": "Autonomous Greenhouse Challenge 2nd edition (2019), 4TU.ResearchData, DOI 10.4121/uuid:88d22c60-21b3-4ea8-90db-20249a5be2a7, CC0",
+ "params": {
+  "real_start": "2020-03-15 04:00",
+  "real_hours": 10,
+  "speedup": 10,
+  "k": 3.0,
+  "history": 24,
+  "seed": 1
+ },
+ "sim_horizon_s": 3600.0,
+ "sample_period_sim_s": 30.0,
+ "real_start_hour": 4.0,
+ "sunrise_hour": 0.08333333333333333,
+ "n_streams": 40,
+ "n_readings": 4800,
+ "dropped_streams": [
+  "AICU/EC_slab1",
+  "AICU/EC_slab2",
+  "Digilog/EC_slab1",
+  "Reference/EC_slab2",
+  "TheAutomators/EC_slab2"
+ ],
+ "streams": [
+  {
+   "stream_id": 0,
+   "comp": "AICU",
+   "file": "GrodanSens.csv",
+   "channel": "WC_slab1",
+   "eps": 0.4447799999999747
+  },
+  {
+   "stream_id": 1,
+   "comp": "AICU",
+   "file": "GrodanSens.csv",
+   "channel": "WC_slab2",
+   "eps": 0.44478000000000634
+  },
+  {
+   "stream_id": 2,
+   "comp": "AICU",
+   "file": "GrodanSens.csv",
+   "channel": "t_slab1",
+   "eps": 0.1499999999999968
+  },
+  {
+   "stream_id": 3,
+   "comp": "AICU",
+   "file": "GrodanSens.csv",
+   "channel": "t_slab2",
+   "eps": 0.1499999999999968
+  },
+  {
+   "stream_id": 4,
+   "comp": "Automatoes",
+   "file": "GrodanSens.csv",
+   "channel": "WC_slab1",
+   "eps": 0.4447799999999747
+  },
+  {
+   "stream_id": 5,
+   "comp": "Automatoes",
+   "file": "GrodanSens.csv",
+   "channel": "WC_slab2",
+   "eps": 0.44478000000000634
+  },
+  {
+   "stream_id": 6,
+   "comp": "Automatoes",
+   "file": "GrodanSens.csv",
+   "channel": "EC_slab1",
+   "eps": 0.14999999999999947
+  },
+  {
+   "stream_id": 7,
+   "comp": "Automatoes",
+   "file": "GrodanSens.csv",
+   "channel": "EC_slab2",
+   "eps": 0.14999999999999947
+  },
+  {
+   "stream_id": 8,
+   "comp": "Automatoes",
+   "file": "GrodanSens.csv",
+   "channel": "t_slab1",
+   "eps": 0.14999999999999147
+  },
+  {
+   "stream_id": 9,
+   "comp": "Automatoes",
+   "file": "GrodanSens.csv",
+   "channel": "t_slab2",
+   "eps": 0.14999999999999147
+  },
+  {
+   "stream_id": 10,
+   "comp": "Digilog",
+   "file": "GrodanSens.csv",
+   "channel": "WC_slab1",
+   "eps": 0.4447799999999747
+  },
+  {
+   "stream_id": 11,
+   "comp": "Digilog",
+   "file": "GrodanSens.csv",
+   "channel": "WC_slab2",
+   "eps": 0.4447799999999747
+  },
+  {
+   "stream_id": 12,
+   "comp": "Digilog",
+   "file": "GrodanSens.csv",
+   "channel": "EC_slab2",
+   "eps": 0.14999999999999947
+  },
+  {
+   "stream_id": 13,
+   "comp": "Digilog",
+   "file": "GrodanSens.csv",
+   "channel": "t_slab1",
+   "eps": 0.14999999999999147
+  },
+  {
+   "stream_id": 14,
+   "comp": "Digilog",
+   "file": "GrodanSens.csv",
+   "channel": "t_slab2",
+   "eps": 0.14999999999999147
+  },
+  {
+   "stream_id": 15,
+   "comp": "IUACAAS",
+   "file": "GrodanSens.csv",
+   "channel": "WC_slab1",
+   "eps": 0.4447800000000379
+  },
+  {
+   "stream_id": 16,
+   "comp": "IUACAAS",
+   "file": "GrodanSens.csv",
+   "channel": "WC_slab2",
+   "eps": 0.4447799999999747
+  },
+  {
+   "stream_id": 17,
+   "comp": "IUACAAS",
+   "file": "GrodanSens.csv",
+   "channel": "EC_slab1",
+   "eps": 0.14999999999999947
+  },
+  {
+   "stream_id": 18,
+   "comp": "IUACAAS",
+   "file": "GrodanSens.csv",
+   "channel": "EC_slab2",
+   "eps": 0.14999999999999947
+  },
+  {
+   "stream_id": 19,
+   "comp": "IUACAAS",
+   "file": "GrodanSens.csv",
+   "channel": "t_slab1",
+   "eps": 0.1499999999999968
+  },
+  {
+   "stream_id": 20,
+   "comp": "IUACAAS",
+   "file": "GrodanSens.csv",
+   "channel": "t_slab2",
+   "eps": 0.1499999999999968
+  },
+  {
+   "stream_id": 21,
+   "comp": "Reference",
+   "file": "GrodanSens.csv",
+   "channel": "WC_slab1",
+   "eps": 0.4447800000000379
+  },
+  {
+   "stream_id": 22,
+   "comp": "Reference",
+   "file": "GrodanSens.csv",
+   "channel": "WC_slab2",
+   "eps": 0.4447799999999747
+  },
+  {
+   "stream_id": 23,
+   "comp": "Reference",
+   "file": "GrodanSens.csv",
+   "channel": "EC_slab1",
+   "eps": 0.14999999999999947
+  },
+  {
+   "stream_id": 24,
+   "comp": "Reference",
+   "file": "GrodanSens.csv",
+   "channel": "t_slab1",
+   "eps": 0.1499999999999968
+  },
+  {
+   "stream_id": 25,
+   "comp": "Reference",
+   "file": "GrodanSens.csv",
+   "channel": "t_slab2",
+   "eps": 0.1499999999999968
+  },
+  {
+   "stream_id": 26,
+   "comp": "TheAutomators",
+   "file": "GrodanSens.csv",
+   "channel": "WC_slab1",
+   "eps": 0.4447799999999747
+  },
+  {
+   "stream_id": 27,
+   "comp": "TheAutomators",
+   "file": "GrodanSens.csv",
+   "channel": "WC_slab2",
+   "eps": 0.4447799999999747
+  },
+  {
+   "stream_id": 28,
+   "comp": "TheAutomators",
+   "file": "GrodanSens.csv",
+   "channel": "EC_slab1",
+   "eps": 0.14999999999999947
+  },
+  {
+   "stream_id": 29,
+   "comp": "TheAutomators",
+   "file": "GrodanSens.csv",
+   "channel": "t_slab1",
+   "eps": 0.1499999999999968
+  },
+  {
+   "stream_id": 30,
+   "comp": "TheAutomators",
+   "file": "GrodanSens.csv",
+   "channel": "t_slab2",
+   "eps": 0.1499999999999968
+  },
+  {
+   "stream_id": 31,
+   "comp": "Reference",
+   "file": "GreenhouseClimate.csv",
+   "channel": "Tair",
+   "eps": 0.44478000000000634
+  },
+  {
+   "stream_id": 32,
+   "comp": "Reference",
+   "file": "GreenhouseClimate.csv",
+   "channel": "Rhair",
+   "eps": 1.779119999999962
+  },
+  {
+   "stream_id": 33,
+   "comp": "Reference",
+   "file": "GreenhouseClimate.csv",
+   "channel": "CO2air",
+   "eps": 71.1648
+  },
+  {
+   "stream_id": 34,
+   "comp": "Reference",
+   "file": "GreenhouseClimate.csv",
+   "channel": "HumDef",
+   "eps": 0.44478000000000034
+  },
+  {
+   "stream_id": 35,
+   "comp": "AICU",
+   "file": "GreenhouseClimate.csv",
+   "channel": "Tair",
+   "eps": 0.44478000000000634
+  },
+  {
+   "stream_id": 36,
+   "comp": "AICU",
+   "file": "GreenhouseClimate.csv",
+   "channel": "Rhair",
+   "eps": 0.8895600000000127
+  },
+  {
+   "stream_id": 37,
+   "comp": "AICU",
+   "file": "GreenhouseClimate.csv",
+   "channel": "CO2air",
+   "eps": 84.5082
+  },
+  {
+   "stream_id": 38,
+   "comp": "AICU",
+   "file": "GreenhouseClimate.csv",
+   "channel": "HumDef",
+   "eps": 0.4447799999999984
+  },
+  {
+   "stream_id": 39,
+   "comp": "Automatoes",
+   "file": "GreenhouseClimate.csv",
+   "channel": "Tair",
+   "eps": 0.44478000000000634
+  }
+ ],
+ "useful_fraction": 0.13270833333333334,
+ "useful_fraction_by_third": {
+  "first": 0.098125,
+  "middle": 0.14625,
+  "last": 0.15375
+ },
+ "mean_entropy_useful": 0.3422553375196233,
+ "mean_entropy_other": 0.16220446312755227,
+ "auc_entropy_vs_useful": 0.7429617498249322,
+ "theta_sweep": {
+  "0.0": {
+   "forwarded": 1.0,
+   "recall": 1.0
+  },
+  "0.1": {
+   "forwarded": 0.53125,
+   "recall": 0.8273155416012559
+  },
+  "0.2": {
+   "forwarded": 0.3725,
+   "recall": 0.6452119309262166
+  },
+  "0.3": {
+   "forwarded": 0.24041666666666667,
+   "recall": 0.4913657770800628
+  },
+  "0.4": {
+   "forwarded": 0.14520833333333333,
+   "recall": 0.36577708006279436
+  },
+  "0.5": {
+   "forwarded": 0.07333333333333333,
+   "recall": 0.2370486656200942
+  },
+  "0.6": {
+   "forwarded": 0.030625,
+   "recall": 0.13343799058084774
+  },
+  "0.7": {
+   "forwarded": 0.016875,
+   "recall": 0.0847723704866562
+  },
+  "0.8": {
+   "forwarded": 0.008958333333333334,
+   "recall": 0.06750392464678179
+  }
+ }
+}

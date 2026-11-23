@@ -9,7 +9,7 @@ import org.json.simple.parser.JSONParser;
 
 /**
  * Minimal ODRL evaluator for the CEGF listings (permission / prohibition, conflict=prohibit).
- * It evaluates the same JSON documents as the paper's listings (see experiments/farm/results/policies.json),
+ * It evaluates the same JSON documents as the paper's listings (see experiments/odrl_engine/policies.json),
  * so decisions inside the iFogSim simulation are produced by the policy documents themselves.
  */
 public class OdrlEval {

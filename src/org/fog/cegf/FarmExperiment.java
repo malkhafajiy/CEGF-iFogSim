@@ -50,7 +50,7 @@ public class FarmExperiment {
             Cfg.realStartH = ((Number) tm.get("real_start_hour")).doubleValue();
             Cfg.sunriseH = ((Number) tm.get("sunrise_hour")).doubleValue();
         }
-        Cfg.policies = OdrlEval.load(a.getOrDefault("policies", "experiments/farm/results/policies.json"));
+        Cfg.policies = OdrlEval.load(a.getOrDefault("policies", "experiments/odrl_engine/policies.json"));
         Cfg.params.put("theta", Cfg.theta); Cfg.params.put("alpha", Cfg.alpha); Cfg.params.put("tau", Cfg.tau);
         Cfg.rnd = new Random(Cfg.seed + 77);
         Cfg.changeT = Double.parseDouble(a.getOrDefault("change_t", "-1")) * 1000;

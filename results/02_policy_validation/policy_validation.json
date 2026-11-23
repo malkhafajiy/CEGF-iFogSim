@@ -1,0 +1,21 @@
+{
+ "validation": {
+  "job_recipient_policy.ttl": {
+   "valid_ODRL": true,
+   "errors": 0,
+   "warnings": 0,
+   "triples": 33
+  },
+  "entropy_policy.ttl": {
+   "valid_ODRL": true,
+   "errors": 0,
+   "warnings": 0,
+   "triples": 9
+  }
+ },
+ "agree": 451,
+ "total": 451,
+ "alpha": 0.25,
+ "tau": 0.7,
+ "theta": 0.3
+}
